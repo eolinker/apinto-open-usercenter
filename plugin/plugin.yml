@@ -1,0 +1,22 @@
+id: "user-open.apinto.com"
+name: "user-open"
+cname: "开源版用户中心"
+resume: "开源版用户中心，提供登录、注销、修改密码等基础功能。"
+version: "v1.0.0"
+icon: "logo.png"
+driver: "local"
+navigation: "navigation.system"
+group_id: "system"
+main: "main"
+frontend:
+  - name: user
+    driver: apinto.local.preload
+    router:
+      - path: login
+        type: root
+        expose: LoginModule
+      - path: user
+        type: normal
+        expose: AppModule
+define:
+  cmd: "user-open.apinto.com"
