@@ -42,15 +42,12 @@ if [ "$BUILD_MODE" = "all" ] || [ ! -d "frontend/dist" ];then
   if ! command -v yarn > /dev/null
   then 
     npm install yarn -g
-  
+  fi
   echo "cd frontend && yarn install --registry https://registry.npmmirror.com --legacy-peer-deps "
   cd frontend && yarn install --registry https://registry.npmmirror.com --legacy-peer-deps
   echo "yarn build"
   yarn build
   cd ../
-  else
-      npm --prefix ./frontend run build
-  fi
 else
   echo "skip frontend building..."
 fi
