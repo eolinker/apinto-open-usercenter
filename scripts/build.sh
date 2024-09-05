@@ -17,6 +17,8 @@ fi
 
 ./scripts/build_plugin.sh ${OUTPUT_DIR} $2 ${VERSION}
 
+PLUGIN_NAME="user-open.apinto.com"
+OUTPUT_BINARY=$OUTPUT_DIR/${PLUGIN_NAME}
 
 mkdir -p user_${VERSION}
 mv ${OUTPUT_BINARY} ./user_${VERSION}

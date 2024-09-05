@@ -9,16 +9,16 @@ require (
 	github.com/eolinker/eosc v0.14.2
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-basic/uuid v1.0.0
-	github.com/golang-jwt/jwt/v5 v5.0.0
-	golang.org/x/crypto v0.21.0
+	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
+	golang.org/x/crypto v0.21.0 // indirect
 	google.golang.org/grpc v1.61.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/mysql v1.5.1 // indirect
-	gorm.io/gorm v1.25.4
+	gorm.io/gorm v1.25.4 // indirect
 )
 
-require github.com/redis/go-redis/v9 v9.5.1
+require github.com/redis/go-redis/v9 v9.5.1 // indirect
 
 require (
 	github.com/bufbuild/protocompile v0.13.0 // indirect
