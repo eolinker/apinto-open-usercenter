@@ -212,28 +212,28 @@ func (m *Module) ssoLoginCheck(ginCtx *gin.Context) {
 
 	cookie, err := ginCtx.Cookie(controller.Session)
 	if err != nil {
-		controller.ErrorJsonWithCode(ginCtx, http.StatusOK, controller.CodeLoginInvalid, loginError)
+		controller.ErrorJsonWithCode(ginCtx, http.StatusOK, controller.CodeLoginInvalid, loginError.Msg)
 		return
 	}
 
 	session, _ := m.sessionCache.Get(ginCtx, cookie)
 	if session == nil {
-		controller.ErrorJsonWithCode(ginCtx, http.StatusOK, controller.CodeLoginInvalid, loginError)
+		controller.ErrorJsonWithCode(ginCtx, http.StatusOK, controller.CodeLoginInvalid, loginError.Msg)
 		return
 	}
 	uc, err := common.JWTDecode(session.Jwt, jwtSecret)
 	if err != nil {
-		controller.ErrorJsonWithCode(ginCtx, http.StatusOK, controller.CodeLoginInvalid, loginError)
+		controller.ErrorJsonWithCode(ginCtx, http.StatusOK, controller.CodeLoginInvalid, loginError.Msg)
 		return
 	}
 
 	info, err := m.userInfoService.GetUserInfo(ginCtx, uc.Id)
 	if err != nil {
-		controller.ErrorJsonWithCode(ginCtx, http.StatusOK, controller.CodeLoginInvalid, loginError)
+		controller.ErrorJsonWithCode(ginCtx, http.StatusOK, controller.CodeLoginInvalid, loginError.Msg)
 		return
 	}
 	if info.LastLoginTime.Format("2006-01-02 15:04:05") != uc.LoginTime || info.UserName != uc.Uname {
-		controller.ErrorJsonWithCode(ginCtx, http.StatusOK, controller.CodeLoginInvalid, loginError)
+		controller.ErrorJsonWithCode(ginCtx, http.StatusOK, controller.CodeLoginInvalid, loginError.Msg)
 		return
 	}
 

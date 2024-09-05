@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	redis "github.com/redis/go-redis/v9"
 
@@ -15,11 +14,11 @@ import (
 	jwt "github.com/golang-jwt/jwt/v5"
 )
 
-var loginError = "登录已失效，请重新登录"
+var loginError = controller.NewLoginInvalidError(controller.CodeLoginInvalid, "登录已失效，请重新登录")
 
 var jwtSecret = []byte("apintp-dashboard")
 
-var secret = []byte("1P&dG^5MceRb0T#7QDu6OtF%)$Nh@q")
+//var secret = []byte("1P&dG^5MceRb0T#7QDu6OtF%)$Nh@q")
 
 func tryAbort(w apinto_module.MiddlewareResponseWriter, data interface{}, abort bool) {
 	if abort {
@@ -48,7 +47,7 @@ func (m *Module) ApiLogin(ctx context.Context, request *apinto_module.Middleware
 	}
 
 	//1.从ginCtx的header中拿到token，没拿到报错提醒用户重新登录
-	verifyToken, err := common.VerifyToken(tokens.Jwt, secret)
+	verifyToken, err := common.VerifyToken(tokens.Jwt, jwtSecret)
 	if err != nil {
 		tryAbort(w, loginError, isNeedLogin)
 		return
@@ -64,9 +63,13 @@ func (m *Module) ApiLogin(ctx context.Context, request *apinto_module.Middleware
 	w.SetHeader(controller.Authorization, tokens.Jwt)
 	w.SetHeader(controller.RAuthorization, tokens.RJwt)
 	claims := verifyToken.Claims.(jwt.MapClaims)
-	userId, _ := strconv.Atoi(claims["userId"].(string))
+	username, ok := claims["username"].(string)
+	if !ok {
+		tryAbort(w, loginError, isNeedLogin)
+		return
+	}
 
-	info, err := m.userInfoService.GetUserInfo(ctx, userId)
+	info, err := m.userInfoService.GetUserInfoByName(ctx, username)
 	if err != nil {
 
 		tryAbort(w, err, isNeedLogin)
@@ -96,7 +99,7 @@ func (m *Module) ModuleLogin(ctx context.Context, request *apinto_module.Middlew
 	}
 
 	//1.从ginCtx的header中拿到token，没拿到报错提醒用户重新登录
-	verifyToken, err := common.VerifyToken(tokens.Jwt, secret)
+	verifyToken, err := common.VerifyToken(tokens.Jwt, jwtSecret)
 	if err != nil {
 
 		DoRedirect(w, request.Url)
@@ -112,9 +115,13 @@ func (m *Module) ModuleLogin(ctx context.Context, request *apinto_module.Middlew
 	w.SetHeader(controller.Authorization, tokens.Jwt)
 	w.SetHeader(controller.RAuthorization, tokens.RJwt)
 	claims := verifyToken.Claims.(jwt.MapClaims)
-	userId, _ := strconv.Atoi(claims["userId"].(string))
+	username, ok := claims["username"].(string)
+	if !ok {
+		DoRedirect(w, request.Url)
+		return
+	}
 
-	info, err := m.userInfoService.GetUserInfo(ctx, userId)
+	info, err := m.userInfoService.GetUserInfoByName(ctx, username)
 	if err != nil {
 		DoRedirect(w, request.Url)
 		return
