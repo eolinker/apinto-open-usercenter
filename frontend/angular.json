@@ -1,0 +1,148 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "apinto-open-usercenter": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "inlineTemplate": true,
+          "inlineStyle": true,
+          "style": "scss",
+          "skipTests": true
+        },
+        "@schematics/angular:class": {
+          "skipTests": true
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true
+        },
+        "@schematics/angular:guard": {
+          "skipTests": true
+        },
+        "@schematics/angular:interceptor": {
+          "skipTests": true
+        },
+        "@schematics/angular:pipe": {
+          "skipTests": true
+        },
+        "@schematics/angular:resolver": {
+          "skipTests": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true
+        }
+      },
+      "root": "projects/core",
+      "sourceRoot": "projects/core/src",
+      "prefix": "eo-ng",
+      "architect": {
+        "build": {
+          "builder": "@angular-builders/custom-webpack:browser",
+          "options": {
+            "deployUrl":"/plugin-frontend/user/",
+            "outputPath": "./dist",
+            "index": "projects/core/src/index.html",
+            "main": "projects/core/src/main.ts",
+            "polyfills": "projects/core/src/polyfills.ts",
+            "tsConfig": "tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/core/src/favicon.ico",
+              "projects/core/src/assets",
+              {
+                "glob": "**/*",
+                "input": "./node_modules/@ant-design/icons-angular/src/inline-svg/",
+                "output": "/assets/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/ace-builds/src-noconflict/",
+                "output": "/ace-builds/"
+              }
+            ],
+            "styles": [
+              "node_modules/ng-zorro-antd/ng-zorro-antd.min.css",
+              "node_modules/eo-ng-button/styles.scss",
+              "node_modules/eo-ng-cascader/styles.scss",
+              "node_modules/eo-ng-checkbox/styles.scss",
+              "node_modules/eo-ng-feedback/styles.scss",
+              "node_modules/eo-ng-input/styles.scss",
+              "node_modules/eo-ng-radio/styles.scss",
+              "node_modules/eo-ng-select/styles.scss",
+              "node_modules/eo-ng-switch/styles.scss",
+              "node_modules/eo-ng-table/styles.scss",
+              "node_modules/eo-ng-tree/styles.scss",
+              "projects/core/src/styles.scss"
+            ],
+            "scripts": [
+            ],
+            "customWebpackConfig": {
+              "path": "webpack.config.ts"
+            },
+            "commonChunk": false
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "4mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "1mb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "projects/core/src/environments/environment.ts",
+                  "with": "projects/core/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-builders/custom-webpack:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "apinto-open-usercenter:build:production"
+            },
+            "development": {
+              "browserTarget": "apinto-open-usercenter:build:development"
+            }
+          },
+          "defaultConfiguration": "development",
+					"options": {
+						"port": 5555,
+						"publicHost": "http://localhost:5555"
+					}
+        },
+        "extract-i18n": {
+          "builder": "@angular-builders/custom-webpack:extract-i18n",
+          "options": {
+            "browserTarget": "apinto-open-usercenter:build"
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "apinto-open-usercenter",
+  "cli": {
+    "analytics": false
+  }
+}
