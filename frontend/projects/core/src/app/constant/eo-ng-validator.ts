@@ -42,14 +42,6 @@ export class EoNgMyValidators extends Validators {
     }
   }
 
-  static roleAccess (control:AbstractControl): EoNgMyValidationErrors | null {
-    const value = control.value
-    if (value.size > 0) {
-      return null
-    } else {
-      return { roleAccess: { 'zh-cn': '角色权限不能为空', en: 'Not Empty' } }
-    }
-  }
 
   static priority (control:AbstractControl): EoNgMyValidationErrors | null {
     const value = control.value

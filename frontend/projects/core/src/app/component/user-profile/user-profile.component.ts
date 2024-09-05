@@ -20,7 +20,6 @@ export class UserProfileComponent implements OnInit {
   validateForm:FormGroup = new FormGroup({})
   autoTips: Record<string, Record<string, string>> = defaultAutoTips
 
-  rolesList:Array<any> = []
   editPage:boolean = false
 
   constructor (private message: EoNgFeedbackMessageService,
@@ -33,7 +32,6 @@ export class UserProfileComponent implements OnInit {
       userNickName: ['', [required]],
       noticeUserId: [''],
       email: ['', [required, email]],
-      role: [''],
       desc: ['']
     })
   }
@@ -45,18 +43,11 @@ export class UserProfileComponent implements OnInit {
         this.getOtherUserProfile(this.userId)
         this.validateForm.controls['userName'].disable()
         if (this.userId === this.baseInfo.userId) {
-          this.validateForm.controls['role'].disable()
         }
-        this.getRolesList(false)
-        break
-      case 'addUser':
-        this.getRolesList(false)
         break
       case 'editCurrentUser':
-        this.getRolesList(true)
         this.getCurrentUserProfile()
         this.validateForm.controls['userName'].disable()
-        this.validateForm.controls['role'].disable()
         break
     }
   }
@@ -68,7 +59,6 @@ export class UserProfileComponent implements OnInit {
         this.validateForm.controls['userNickName'].setValue(resp.data.profile.nickName)
         this.validateForm.controls['noticeUserId'].setValue(resp.data.profile.noticeUserId)
         this.validateForm.controls['email'].setValue(resp.data.profile.email)
-        this.validateForm.controls['role'].setValue(resp.data.profile.roleIds[0])
         this.validateForm.controls['desc'].setValue(resp.data.describe)
       } else {
         this.message.error(resp.msg || '获取用户信息失败!')
@@ -83,31 +73,10 @@ export class UserProfileComponent implements OnInit {
           this.validateForm.controls['userNickName'].setValue(resp.data.profile.nickName)
           this.validateForm.controls['noticeUserId'].setValue(resp.data.profile.noticeUserId)
           this.validateForm.controls['email'].setValue(resp.data.profile.email)
-          this.validateForm.controls['role'].setValue(resp.data.profile.roleIds[0])
           this.validateForm.controls['desc'].setValue(resp.data.describe)
         }
       })
   }
-
-  // 获取角色id与title对应值, 传入list时,需要为该list的角色id与角色名匹配
-  // 传入参数为true时,展示超管角色
-  getRolesList (showM:boolean) {
-    this.api.get('role/options').subscribe((resp:any)=>{
-      if (resp.code === 0) {
-        this.rolesList = showM
-          ? resp.data.roles
-          : resp.data.roles.filter((item:any) => {
-            return item.title !== '超级管理员'
-          })
-        for (const index in this.rolesList) {
-          this.rolesList[index].label = this.rolesList[index].title
-          this.rolesList[index].value = this.rolesList[index].id
-        }
-        this.rolesList.push({ label: '未分配', value: '' })
-      }
-    })
-  }
-
 
   backToList (value:any) {
     this.closeModal(value)
@@ -118,22 +87,6 @@ export class UserProfileComponent implements OnInit {
   saveUserProfile () {
     if (this.validateForm.valid) {
       switch (this.type) {
-        case 'addUser':
-          this.api.post('user/profile',{
-              userName: this.validateForm.value.userName,
-              nickName: this.validateForm.value.userNickName,
-              noticeUserId: this.validateForm.value.noticeUserId,
-              email: this.validateForm.value.email,
-              desc: this.validateForm.value.desc || '',
-              roleIds: [this.validateForm.value.role]
-                }).subscribe((resp:any)=>{
-                  if (resp.code === 0) {
-                    this.showMessageAndCloseModal(resp)
-                  } else {
-                    this.message.error(resp.msg || '修改失败!')
-                  }
-                })
-            break
         case 'editUser':
           this.api.put('user/profile',{
               userName: this.validateForm.controls['userName'].value,
@@ -141,7 +94,6 @@ export class UserProfileComponent implements OnInit {
               noticeUserId: this.validateForm.value.noticeUserId,
               email: this.validateForm.value.email,
               desc: this.validateForm.value.desc || '',
-              roleIds: [this.validateForm.value.role]
             }, {id:this.userId}).subscribe((resp:any)=>{
             if (resp.code === 0) {
               this.showMessageAndCloseModal(resp)
@@ -209,12 +161,4 @@ export class EoNgMyValidators extends Validators {
     }
   }
 
-  static roleAccess (control:AbstractControl): EoNgMyValidationErrors | null {
-    const value = control.value
-    if (value.size > 0) {
-      return null
-    } else {
-      return { roleAccess: { 'zh-cn': '角色权限不能为空', en: 'Not Empty' } }
-    }
-  }
 }
