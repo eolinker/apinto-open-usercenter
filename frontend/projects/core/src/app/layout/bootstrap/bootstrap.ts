@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { UserAvatarComponent } from '../../component/user-avatar/user-avatar.component';
 import { UserAvatarModule } from '../../component/user-avatar/user-avatar.module';
 import { Injector } from '@angular/core';
@@ -8,9 +9,12 @@ export async function bootstrap( props: any): Promise<void> {
 
   // 使用这些服务执行你需要的操作
   const {
+    pluginEventHub,
     pluginSlotHub,
     pluginProvider,
-    platformProvider
+    platformProvider,
+    closeModal,
+    router,
   } = props
 
   // 需要修改基座路由，使未定义的路由跳转至登录页->主页
@@ -20,6 +24,31 @@ export async function bootstrap( props: any): Promise<void> {
     redirectTo: 'login'
   })
 
+  
+  // 需要监听http响应，判断用户是否需要重新登录
+  pluginEventHub.on('httpResponse', (eventData: any) => {
+    const continueRes = checkAccess(eventData.res.body.code,  closeModal, router)
+    return {
+      data: eventData,
+      continue: continueRes
+    }
+  })
+
+
+  const checkAccess = (code: number,closeModal: Function, router: Router) => {
+    switch (code) {
+      case -3:
+        setTimeout(() => {
+          closeModal()
+          if (!router.url.includes('/login')) {
+            router.navigate(['/', 'login'], {queryParams: {callback: router.url}, queryParamsHandling: 'merge'})
+          }
+        }, 1000)
+        return false
+      default:
+        return true
+    }
+  }
 
   // 渲染用户头像
   const ModuleRef = await platformProvider.getPlatformRef().bootstrapModule(UserAvatarModule, {ngZone: platformProvider.getNgZone()})
