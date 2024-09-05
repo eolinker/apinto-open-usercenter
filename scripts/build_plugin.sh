@@ -6,7 +6,7 @@
 # exit when any command fails
 
 set -e
-PLUGIN_NAME="user.apinto.com"
+PLUGIN_NAME="user-open.apinto.com"
 cd "$(dirname "$0")/../"
 . ./scripts/init.sh
 
