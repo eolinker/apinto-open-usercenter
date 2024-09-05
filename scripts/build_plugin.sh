@@ -39,16 +39,15 @@ echo "Step 1 - building apinto user frontend..."
 
 if [ "$BUILD_MODE" = "all" ] || [ ! -d "frontend/dist" ];then
   echo "begin frontend building..."
-  if command -v pnpm > /dev/null
-  then
-      pnpm --dir ./frontend i && pnpm --dir ./frontend build
-  elif command -v yarn > /dev/null
-  then
-      echo "cd frontend && yarn install --registry https://registry.npmmirror.com --legacy-peer-deps "
-      cd frontend && yarn install --registry https://registry.npmmirror.com --legacy-peer-deps
-      echo "yarn build"
-      yarn build
-      cd ../
+  if ! command -v yarn > /dev/null
+  then 
+    npm install yarn -g
+  
+  echo "cd frontend && yarn install --registry https://registry.npmmirror.com --legacy-peer-deps "
+  cd frontend && yarn install --registry https://registry.npmmirror.com --legacy-peer-deps
+  echo "yarn build"
+  yarn build
+  cd ../
   else
       npm --prefix ./frontend run build
   fi
