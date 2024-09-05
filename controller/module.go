@@ -64,7 +64,7 @@ func (m *Module) apis() []pm3.Api {
 		{Method: http.MethodPut, Authority: pm3.Public, Path: "/api/my/profile", HandlerFunc: m.myProfileUpdate},
 		{Method: http.MethodGet, Authority: pm3.Public, Path: "/api/my/profile", HandlerFunc: m.myProfile},
 		{Method: http.MethodPost, Authority: pm3.Public, Path: "/api/my/password", HandlerFunc: m.setPassword},
-		{Method: http.MethodGet, Authority: pm3.Public, Path: "/api/user/enum", HandlerFunc: m.userEnum},
+		//{Method: http.MethodGet, Authority: pm3.Public, Path: "/api/user/enum", HandlerFunc: m.userEnum},
 		{Method: http.MethodPost, Path: "/sso/login", HandlerFunc: m.ssoLogin, Authority: pm3.Anonymous},
 		{Method: http.MethodPost, Path: "/sso/logout", HandlerFunc: m.ssoLogout, Authority: pm3.Anonymous},
 		{Method: http.MethodPost, Path: "/sso/login/check", HandlerFunc: m.ssoLoginCheck, Authority: pm3.Anonymous},
