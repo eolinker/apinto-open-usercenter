@@ -1,15 +1,18 @@
 package controller
 
 import (
+	"net/http"
+	"strings"
+
 	"github.com/eolinker/apinto-dashboard/cache"
 	grpcservice "github.com/eolinker/apinto-dashboard/grpc-service"
 	"github.com/eolinker/apinto-dashboard/modules/mpm3"
+	"github.com/eolinker/apinto-dashboard/plugin/go-plugin/plugin"
 	"github.com/eolinker/apinto-dashboard/plugin/go-plugin/shared"
 	"github.com/eolinker/apinto-dashboard/pm3"
 	"github.com/eolinker/apinto-open-usercenter/frontend"
 	"github.com/eolinker/apinto-open-usercenter/service"
 	"github.com/eolinker/eosc/common/bean"
-	"net/http"
 )
 
 type Driver struct {
@@ -74,17 +77,17 @@ func (m *Module) apis() []pm3.Api {
 
 func (m *Module) middlewares() []shared.Middleware {
 	mds := make([]shared.Middleware, 0, 2)
-	//mds = append(mds, plugin.NewMiddleware(func(info pm3.ApiInfo) bool {
-	//	return false
-	//}, plugin.ProcessRequestBy(m.ModuleLogin)))
-	//
-	//mds = append(mds, plugin.NewMiddleware(func(info pm3.ApiInfo) bool {
-	//	if info.Authority == pm3.Anonymous {
-	//		return false
-	//	}
-	//
-	//	return strings.HasPrefix(info.Path, "/api/")
-	//}, plugin.ProcessRequestBy(m.ApiLogin)))
-	//
+	mds = append(mds, plugin.NewMiddleware(func(info pm3.ApiInfo) bool {
+		return false
+	}, plugin.ProcessRequestBy(m.ModuleLogin)))
+
+	mds = append(mds, plugin.NewMiddleware(func(info pm3.ApiInfo) bool {
+		if info.Authority == pm3.Anonymous {
+			return false
+		}
+
+		return strings.HasPrefix(info.Path, "/api/")
+	}, plugin.ProcessRequestBy(m.ApiLogin)))
+
 	return mds
 }

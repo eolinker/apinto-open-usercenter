@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-	
+
+	jwt "github.com/golang-jwt/jwt/v5"
+
 	user_model "github.com/eolinker/apinto-open-usercenter/model"
-	
+
 	"github.com/go-basic/uuid"
-	
+
 	"github.com/eolinker/apinto-dashboard/common"
 	"github.com/eolinker/apinto-dashboard/controller"
 	user_dto "github.com/eolinker/apinto-open-usercenter/dto"
@@ -117,39 +119,7 @@ func (m *Module) setPassword(ginCtx *gin.Context) {
 	ginCtx.JSON(http.StatusOK, controller.NewSuccessResult(nil))
 
 }
-func (m *Module) userEnum(ginCtx *gin.Context) {
-	userInfoList, err := m.userInfoService.GetAllUsers(ginCtx)
-	if err != nil {
-		controller.ErrorJson(ginCtx, http.StatusOK, fmt.Sprintf("获取用户列表失败. err:%s", err.Error()))
-		return
-	}
 
-	resList := make([]user_dto.UserInfo, 0, len(userInfoList))
-
-	for _, userInfo := range userInfoList {
-		lastLogin := ""
-		if userInfo.LastLoginTime != nil {
-			lastLogin = common.TimeToStr(*userInfo.LastLoginTime)
-		}
-		resUserInfo := user_dto.UserInfo{
-			Id:           userInfo.Id,
-			Sex:          userInfo.Sex,
-			Avatar:       userInfo.Avatar,
-			Email:        userInfo.Email,
-			Phone:        userInfo.Phone,
-			UserName:     userInfo.UserName,
-			NickName:     userInfo.NickName,
-			NoticeUserId: userInfo.NoticeUserId,
-			LastLogin:    lastLogin,
-		}
-		resList = append(resList, resUserInfo)
-	}
-
-	result := make(map[string]interface{})
-	result["users"] = resList
-
-	ginCtx.JSON(http.StatusOK, controller.NewSuccessResult(result))
-}
 func (m *Module) access(ginCtx *gin.Context) {
 	modules, err := m.moduleService.GetEnabled(ginCtx)
 	if err != nil {
@@ -194,6 +164,9 @@ func (m *Module) ssoLogin(ginCtx *gin.Context) {
 		Id:        id,
 		Uname:     loginInfo.Username,
 		LoginTime: now.Format("2006-01-02 15:04:05"),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(now.Add(time.Hour * 24 * 7)),
+		},
 	}, jwtSecret)
 	if err != nil {
 		controller.ErrorJson(ginCtx, http.StatusOK, "登录失败")

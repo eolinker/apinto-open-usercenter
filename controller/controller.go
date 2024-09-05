@@ -1,19 +1,19 @@
 package controller
 
 import (
-	"github.com/eolinker/apinto-dashboard/controller"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 )
 
 func (m *Module) getUserId(ginCtx *gin.Context) int {
-	userName := ginCtx.GetString(controller.UserName)
-	if userName == "" {
+	uId, _ := ginCtx.Cookie("uid")
+	if uId == "" {
 		return 0
 	}
-	info, err := m.userInfoService.GetUserInfoByName(ginCtx, userName)
+	userId, err := strconv.Atoi(uId)
 	if err != nil {
 		return 0
 	}
-	return info.Id
-
+	return userId
 }
