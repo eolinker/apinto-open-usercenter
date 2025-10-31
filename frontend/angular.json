@@ -41,7 +41,7 @@
         "build": {
           "builder": "@angular-builders/custom-webpack:browser",
           "options": {
-            "deployUrl":"/plugin-frontend/user/",
+            "baseHref":"/plugin-frontend/user/",
             "outputPath": "./dist",
             "index": "projects/core/src/index.html",
             "main": "projects/core/src/main.ts",
